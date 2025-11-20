@@ -1,7 +1,7 @@
 export default function LandingPage() {
   return (
     <div className="min-h-screen">
-      <h1 className="text-4xl font-bold text-center mt-20">
+      <h1 className="text-3xl font-medium text-center mt-20 text-primary">
         Welcome to Hack Aware
       </h1>
       <p className="text-center mt-4 text-lg">
