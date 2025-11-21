@@ -1,10 +1,26 @@
 @import "tailwindcss";
 @import "./fonts.css";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --color-bg-dark: hsl(0 0% 90%);
+  --color-bg: hsl(300 0% 95%);
+  --color-bg-light: hsl(300 50% 100%);
+  --color-text: hsl(300 0% 4%);
+  --color-text-muted: hsl(0 0% 28%);
+  --color-highlight: hsl(300 50% 100%);
+  --color-border: hsl(NaN 0% 50%);
+  --color-border-muted: hsl(340 0% 62%);
+  --color-primary: hsl(161 100% 13%);
+  --color-secondary: hsl(319 39% 30%);
+  --color-danger: hsl(9 21% 41%);
+  --color-warning: hsl(52 23% 34%);
+  --color-success: hsl(147 19% 36%);
+  --color-info: hsl(217 22% 41%);
+}
+
+.dark {
   --color-bg-dark: hsl(336 0% 1%);
   --color-bg: hsl(300 0% 4%);
   --color-bg-light: hsl(0 0% 9%);
@@ -13,8 +29,8 @@
   --color-highlight: hsl(330 0% 39%);
   --color-border: hsl(0 0% 28%);
   --color-border-muted: hsl(300 0% 18%);
-  --color-primary: hsl(111 33% 64%);
-  --color-secondary: hsl(290 43% 73%);
+  --color-primary: hsl(150 41% 61%);
+  --color-secondary: hsl(322 50% 73%);
   --color-danger: hsl(9 26% 64%);
   --color-warning: hsl(52 19% 57%);
   --color-success: hsl(146 17% 59%);
@@ -102,33 +118,6 @@ body {
   --sidebar-accent-foreground: var(--color-bg-dark);
   --sidebar-border: var(--color-border-muted);
   --sidebar-ring: var(--color-primary);
-}
-
-.dark {
-  --background: var(--color-bg-dark);
-  --foreground: var(--color-text);
-  --card: var(--color-bg);
-  --card-foreground: var(--color-text);
-  --popover: var(--color-bg);
-  --popover-foreground: var(--color-text);
-  --primary: var(--color-primary);
-  --primary-foreground: var(--color-bg-dark);
-  --secondary: var(--color-secondary);
-  --secondary-foreground: var(--color-bg-dark);
-  --muted: var(--color-text-muted);
-  --muted-foreground: var(--color-text);
-  --accent: var(--color-highlight);
-  --accent-foreground: var(--color-text);
-  --destructive: var(--color-danger);
-  --border: var(--color-border-muted);
-  --input: var(--color-border);
-  --ring: var(--color-primary);
-
-  --chart-1: var(--color-primary);
-  --chart-2: var(--color-secondary);
-  --chart-3: var(--color-success);
-  --chart-4: var(--color-warning);
-  --chart-5: var(--color-danger);
 }
 
 @layer base {

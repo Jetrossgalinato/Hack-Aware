@@ -19,7 +19,7 @@ export default function LoginPage() {
         <ModeToggle />
       </div>
       <div className="flex justify-center items-center flex-grow">
-        <Card className="w-full max-w-sm">
+        <Card className="w-full max-w-sm bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="text-lg">Login to your account</CardTitle>
             <CardDescription>
