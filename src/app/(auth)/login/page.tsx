@@ -31,12 +31,7 @@ export default function LoginPage() {
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                  />
+                  <Input id="email" type="email" required />
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center">
@@ -56,7 +51,7 @@ export default function LoginPage() {
             </Button>
             <CardAction className="flex justify-center w-full">
               <div className="flex items-center gap-1">
-                <span className="text-sm">
+                <span className="text-sm font-light">
                   {"Don't have an account?"}
                   <Button variant="link" className="text-sm p-1 h-auto">
                     Sign Up

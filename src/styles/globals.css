@@ -21,8 +21,8 @@
 }
 
 .dark {
-  --color-bg-dark: hsl(336 0% 1%);
-  --color-bg: hsl(300 0% 4%);
+  --color-bg-dark: hsl(0, 0%, 6%);
+  --color-bg: hsl(300 0% 8%);
   --color-bg-light: hsl(0 0% 9%);
   --color-text: hsl(300 0% 95%);
   --color-text-muted: hsl(300 0% 69%);
@@ -85,9 +85,9 @@ body {
   --radius: 0.625rem;
 
   /* Map your custom HSL theme to existing tokens */
-  --background: var(--color-bg);
+  --background: var(--color-bg-dark);
   --foreground: var(--color-text);
-  --card: var(--color-bg-light);
+  --card: var(--color-bg);
   --card-foreground: var(--color-text);
   --popover: var(--color-bg-light);
   --popover-foreground: var(--color-text);
