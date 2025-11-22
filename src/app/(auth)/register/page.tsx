@@ -19,7 +19,10 @@ export default function RegisterPage() {
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
-      <div className="flex justify-center items-center flex-grow">
+      <div className="flex flex-col items-center flex-grow justify-center">
+        <h1 className="mb-8 text-3xl font-bold tracking-tight text-primary">
+          Hack Aware
+        </h1>
         <Card
           className="w-full max-w-sm bg-card text-card-foreground"
           style={{ boxShadow: "var(--shadow-l)" }}
