@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/components/mode-toggler";
+import Link from "next/link";
 
 export default function LoginPage() {
   return (
@@ -56,8 +57,8 @@ export default function LoginPage() {
               <div className="flex items-center gap-1">
                 <span className="text-sm font-light">
                   {"Don't have an account?"}
-                  <Button variant="link" className="text-sm p-1 h-auto">
-                    Sign Up
+                  <Button asChild variant="link" className="text-sm p-1 h-auto">
+                    <Link href="/register">Sign Up</Link>
                   </Button>
                 </span>
               </div>

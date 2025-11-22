@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/components/mode-toggler";
+import Link from "next/link";
 
 export default function RegisterPage() {
   return (
@@ -19,7 +20,10 @@ export default function RegisterPage() {
         <ModeToggle />
       </div>
       <div className="flex justify-center items-center flex-grow">
-        <Card className="w-full max-w-sm bg-card text-card-foreground">
+        <Card
+          className="w-full max-w-sm bg-card text-card-foreground"
+          style={{ boxShadow: "var(--shadow-l)" }}
+        >
           <CardHeader>
             <CardTitle className="text-lg">Register for an account</CardTitle>
             <CardDescription>
@@ -59,8 +63,8 @@ export default function RegisterPage() {
               <div className="flex items-center gap-1">
                 <span className="text-sm font-light">
                   {"Already have an account?"}
-                  <Button variant="link" className="text-sm p-1 h-auto">
-                    Login
+                  <Button asChild variant="link" className="text-sm p-1 h-auto">
+                    <Link href="/">Login</Link>
                   </Button>
                 </span>
               </div>
