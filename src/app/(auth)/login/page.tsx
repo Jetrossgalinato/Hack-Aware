@@ -12,8 +12,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/components/mode-toggler";
 import Link from "next/link";
+import { useAuth } from "@/lib/useAuth";
+import { useState } from "react";
 
 export default function LoginPage() {
+  const { signIn, loading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const error = await signIn(email, password);
+    if (error) {
+      alert(error);
+    } else {
+      alert("Login successful!");
+    }
+  };
+
   return (
     <div className="min-h-screen h-full flex flex-col bg-background">
       <div className="absolute top-4 right-4">
@@ -34,25 +50,37 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
+            <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" required />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
                   </div>
-                  <Input id="password" type="password" required />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                 </div>
               </div>
+              <Button type="submit" className="w-full mt-4" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </Button>
             </form>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full mb-2">
-              Login
-            </Button>
             <Button variant="outline" className="w-full">
               Login with Google
             </Button>
