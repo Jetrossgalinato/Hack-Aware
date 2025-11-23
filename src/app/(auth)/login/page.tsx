@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,19 +15,24 @@ import { ModeToggle } from "@/components/mode-toggler";
 import Link from "next/link";
 import { useAuth } from "@/lib/useAuth";
 import { useState } from "react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const { signIn, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<{
+    type: "error" | "success";
+    text: string;
+  } | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const error = await signIn(email, password);
     if (error) {
-      alert(error);
+      setMessage({ type: "error", text: error });
     } else {
-      alert("Login successful!");
+      setMessage({ type: "success", text: "Login successful!" });
     }
   };
 
@@ -50,6 +56,17 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {message && (
+              <Alert
+                variant={message.type === "error" ? "destructive" : "default"}
+                className="mb-4"
+              >
+                <AlertTitle>
+                  {message.type === "error" ? "Error" : "Success"}
+                </AlertTitle>
+                <AlertDescription>{message.text}</AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
