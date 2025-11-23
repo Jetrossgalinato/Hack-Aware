@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Hack Aware",
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning className={cn("dark", "light")}>
       <body suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
