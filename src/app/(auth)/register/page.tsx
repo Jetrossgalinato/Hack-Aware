@@ -15,29 +15,29 @@ import { ModeToggle } from "@/components/mode-toggler";
 import Link from "next/link";
 import { useAuth } from "@/lib/useAuth";
 import { useState } from "react";
-import { SlidingAlert } from "@/components/ui/SlidingAlert";
+import { useRouter } from "next/navigation";
+import { useSlidingAlert } from "@/components/ui/SlidingAlert";
 
 export default function RegisterPage() {
   const { signUp, loading } = useAuth();
+  const router = useRouter();
+  const { showMessage } = useSlidingAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState<{
-    type: "error" | "success";
-    text: string;
-  } | null>(null);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setMessage({ type: "error", text: "Passwords do not match!" });
+      showMessage({ type: "error", text: "Passwords do not match!" });
       return;
     }
     const error = await signUp(email, password);
     if (error) {
-      setMessage({ type: "error", text: error });
+      showMessage({ type: "error", text: error });
     } else {
-      setMessage({ type: "success", text: "Registration successful!" });
+      showMessage({ type: "success", text: "Registration successful!" });
+      router.push("/");
     }
   };
 
@@ -46,7 +46,6 @@ export default function RegisterPage() {
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
-      <SlidingAlert message={message} onClose={() => setMessage(null)} />
       <div className="flex flex-col items-center flex-grow justify-center">
         <h1 className="mb-8 text-3xl font-bold tracking-tight text-primary">
           Hack Aware

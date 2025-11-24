@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
+import { SlidingAlertProvider } from "@/components/ui/SlidingAlert";
 
 export const metadata: Metadata = {
   title: "Hack Aware",
@@ -24,7 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SlidingAlertProvider>{children}</SlidingAlertProvider>
         </ThemeProvider>
       </body>
     </html>

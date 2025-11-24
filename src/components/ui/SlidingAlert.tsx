@@ -1,55 +1,65 @@
 "use client";
 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
+import { createPortal } from "react-dom";
 
-type SlidingAlertProps = {
-  message: { type: "error" | "success"; text: string } | null;
-  onClose: () => void;
-};
+// Context for managing the SlidingAlert globally
+const SlidingAlertContext = createContext<{
+  showMessage: (message: { type: "error" | "success"; text: string }) => void;
+}>({
+  showMessage: () => {},
+});
 
-export const SlidingAlert: React.FC<SlidingAlertProps> = ({
-  message,
-  onClose,
+export const useSlidingAlert = () => useContext(SlidingAlertContext);
+
+export const SlidingAlertProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
 }) => {
+  const [message, setMessage] = useState<{
+    type: "error" | "success";
+    text: string;
+  } | null>(null);
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    if (message) {
-      const showTimer = setTimeout(() => setVisible(true), 0); // Delay to avoid synchronous state update
-      const hideTimer = setTimeout(() => {
-        setVisible(false);
-        setTimeout(onClose, 300); // Allow time for sliding out animation
-      }, 3000);
-      return () => {
-        clearTimeout(showTimer);
-        clearTimeout(hideTimer);
-      };
-    }
-  }, [message, onClose]);
-
-  if (!message) return null;
-
-  const alertStyles =
-    message.type === "error"
-      ? "text-[var(--color-danger)] border-[var(--color-danger)]"
-      : "text-[var(--color-success)] border-[var(--color-success)]";
+  const showMessage = (newMessage: {
+    type: "error" | "success";
+    text: string;
+  }) => {
+    setMessage(newMessage);
+    setVisible(true);
+    setTimeout(() => {
+      setVisible(false);
+      setTimeout(() => setMessage(null), 300); // Allow time for sliding out animation
+    }, 3000);
+  };
 
   return (
-    <div
-      className={`fixed top-20 right-4 z-50 transition-transform duration-300 ${
-        visible ? "translate-x-0" : "translate-x-full"
-      }`}
-    >
-      <Alert
-        className={`${alertStyles} border`}
-        variant={message.type === "error" ? "destructive" : "default"}
-      >
-        <AlertTitle>
-          {message.type === "error" ? "Error" : "Success"}
-        </AlertTitle>
-        <AlertDescription>{message.text}</AlertDescription>
-      </Alert>
-    </div>
+    <SlidingAlertContext.Provider value={{ showMessage }}>
+      {children}
+      {message &&
+        createPortal(
+          <div
+            className={`fixed top-20 right-4 z-50 transition-transform duration-300 ${
+              visible ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <Alert
+              className={`${
+                message.type === "error"
+                  ? "text-[var(--color-danger)] border-[var(--color-danger)]"
+                  : "text-[var(--color-success)] border-[var(--color-success)]"
+              } border`}
+              variant={message.type === "error" ? "destructive" : "default"}
+            >
+              <AlertTitle>
+                {message.type === "error" ? "Error!" : "Success!"}
+              </AlertTitle>
+              <AlertDescription>{message.text}</AlertDescription>
+            </Alert>
+          </div>,
+          document.body
+        )}
+    </SlidingAlertContext.Provider>
   );
 };

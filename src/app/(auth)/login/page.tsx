@@ -13,26 +13,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/components/mode-toggler";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/useAuth";
 import { useState } from "react";
-import { SlidingAlert } from "@/components/ui/SlidingAlert";
+import { useSlidingAlert } from "@/components/ui/SlidingAlert";
 
 export default function LoginPage() {
   const { signIn, loading } = useAuth();
+  const router = useRouter();
+  const { showMessage } = useSlidingAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState<{
-    type: "error" | "success";
-    text: string;
-  } | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const error = await signIn(email, password);
     if (error) {
-      setMessage({ type: "error", text: error });
+      showMessage({ type: "error", text: error });
     } else {
-      setMessage({ type: "success", text: "Login successful!" });
+      showMessage({ type: "success", text: "Login successful!" });
+      router.push("/home");
     }
   };
 
@@ -41,7 +41,6 @@ export default function LoginPage() {
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
-      <SlidingAlert message={message} onClose={() => setMessage(null)} />
       <div className="flex flex-col items-center flex-grow justify-center">
         <h1 className="mb-8 text-3xl font-bold tracking-tight text-primary">
           Hack Aware
