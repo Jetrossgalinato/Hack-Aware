@@ -4,11 +4,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ModeToggle } from "@/components/mode-toggler";
 import { useSlidingAlert } from "@/components/ui/SlidingAlert";
+import { useAuth } from "@/lib/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const [url, setUrl] = useState("");
   const { showMessage } = useSlidingAlert();
+  const { signOut } = useAuth();
+  const router = useRouter();
 
   const handleCheckVulnerabilities = async () => {
     if (!url) {
@@ -40,8 +45,20 @@ export default function HomePage() {
     }
   };
 
+  const handleLogout = () => {
+    signOut();
+    showMessage({ type: "success", text: "Logged out successfully." });
+    router.push("/");
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+      <div className="absolute top-4 right-4 flex items-center gap-4">
+        <ModeToggle />
+        <Button variant="outline" onClick={handleLogout}>
+          Logout
+        </Button>
+      </div>
       <h1 className="text-4xl font-bold mb-6 text-primary">
         Website Vulnerability Checker
       </h1>
