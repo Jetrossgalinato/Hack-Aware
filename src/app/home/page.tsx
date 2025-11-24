@@ -8,6 +8,7 @@ import { ModeToggle } from "@/components/mode-toggler";
 import { useSlidingAlert } from "@/components/ui/SlidingAlert";
 import { useAuth } from "@/lib/useAuth";
 import { useRouter } from "next/navigation";
+import AuthGuard from "@/lib/AuthGuard";
 
 export default function HomePage() {
   const [url, setUrl] = useState("");
@@ -52,39 +53,41 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
-      <div className="absolute top-4 right-4 flex items-center gap-4">
-        <ModeToggle />
-        <Button variant="outline" onClick={handleLogout}>
-          Logout
-        </Button>
-      </div>
-      <h1 className="text-4xl font-bold mb-6 text-primary">
-        Website Vulnerability Checker
-      </h1>
-      <p className="text-lg text-muted mb-8 text-center max-w-2xl">
-        Enter the URL of a website to check for common vulnerabilities and
-        ensure your site is secure.
-      </p>
-      <div className="w-full max-w-md">
-        <div className="flex flex-col gap-4">
-          <div>
-            <Label htmlFor="url" className="mb-4">
-              Website URL
-            </Label>
-            <Input
-              id="url"
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              required
-            />
-          </div>
-          <Button onClick={handleCheckVulnerabilities} className="w-full">
-            Check Vulnerabilities
+    <AuthGuard>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <div className="absolute top-4 right-4 flex items-center gap-4">
+          <ModeToggle />
+          <Button variant="outline" onClick={handleLogout}>
+            Logout
           </Button>
         </div>
+        <h1 className="text-4xl font-bold mb-6 text-primary">
+          Website Vulnerability Checker
+        </h1>
+        <p className="text-lg text-muted mb-8 text-center max-w-2xl">
+          Enter the URL of a website to check for common vulnerabilities and
+          ensure your site is secure.
+        </p>
+        <div className="w-full max-w-md">
+          <div className="flex flex-col gap-4">
+            <div>
+              <Label htmlFor="url" className="mb-4">
+                Website URL
+              </Label>
+              <Input
+                id="url"
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                required
+              />
+            </div>
+            <Button onClick={handleCheckVulnerabilities} className="w-full">
+              Check Vulnerabilities
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }
