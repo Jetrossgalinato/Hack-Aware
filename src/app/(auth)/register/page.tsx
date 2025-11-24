@@ -15,7 +15,7 @@ import { ModeToggle } from "@/components/mode-toggler";
 import Link from "next/link";
 import { useAuth } from "@/lib/useAuth";
 import { useState } from "react";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { SlidingAlert } from "@/components/ui/SlidingAlert";
 
 export default function RegisterPage() {
   const { signUp, loading } = useAuth();
@@ -46,6 +46,7 @@ export default function RegisterPage() {
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
+      <SlidingAlert message={message} onClose={() => setMessage(null)} />
       <div className="flex flex-col items-center flex-grow justify-center">
         <h1 className="mb-8 text-3xl font-bold tracking-tight text-primary">
           Hack Aware
@@ -61,17 +62,6 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {message && (
-              <Alert
-                variant={message.type === "error" ? "destructive" : "default"}
-                className="mb-4"
-              >
-                <AlertTitle>
-                  {message.type === "error" ? "Error" : "Success"}
-                </AlertTitle>
-                <AlertDescription>{message.text}</AlertDescription>
-              </Alert>
-            )}
             <form onSubmit={handleRegister}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">

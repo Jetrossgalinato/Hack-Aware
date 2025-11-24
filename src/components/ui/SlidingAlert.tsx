@@ -30,13 +30,21 @@ export const SlidingAlert: React.FC<SlidingAlertProps> = ({
 
   if (!message) return null;
 
+  const alertStyles =
+    message.type === "error"
+      ? "text-[var(--color-danger)] border-[var(--color-danger)]"
+      : "text-[var(--color-success)] border-[var(--color-success)]";
+
   return (
     <div
-      className={`fixed top-4 right-4 z-50 transition-transform duration-300 ${
+      className={`fixed top-20 right-4 z-50 transition-transform duration-300 ${
         visible ? "translate-x-0" : "translate-x-full"
       }`}
     >
-      <Alert variant={message.type === "error" ? "destructive" : "default"}>
+      <Alert
+        className={`${alertStyles} border`}
+        variant={message.type === "error" ? "destructive" : "default"}
+      >
         <AlertTitle>
           {message.type === "error" ? "Error" : "Success"}
         </AlertTitle>
