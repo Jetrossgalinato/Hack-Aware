@@ -45,9 +45,10 @@ function generateFallbackAnalysis(scanResult: ScanResult): string {
   analysis += `Found ${scanResult.alerts.length} potential issues:\n\n`;
 
   scanResult.alerts.forEach((alert, index) => {
-    analysis += `${index + 1}. ${alert.alert} - ${alert.risk} Risk\n`;
-    analysis += `   Description: ${alert.description}\n`;
-    analysis += `   Solution: ${alert.solution}\n\n`;
+    analysis += `${index + 1}. ${alert.alert} (${alert.risk} Risk)\n`;
+    analysis += `\n   Description:\n   ${alert.description}\n`;
+    analysis += `\n   Solution:\n   ${alert.solution}\n`;
+    analysis += `\n--------------------------------------------------\n\n`;
   });
 
   return analysis;
