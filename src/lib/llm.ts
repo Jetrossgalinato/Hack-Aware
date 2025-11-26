@@ -21,8 +21,8 @@ export async function analyzeReport(scanResult: ScanResult): Promise<string> {
   `;
 
   try {
-    // Use 'gemini-2.0-flash' which is the latest model
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // Use 'gemini-2.0-flash-exp' which is the latest model
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || "No analysis generated.";

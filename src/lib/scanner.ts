@@ -31,13 +31,38 @@ export async function scanUrl(url: string): Promise<ScanResult> {
     const scanId = spiderData.scan;
     console.log(`Spider started with ID: ${scanId}`);
 
-    // 2. Wait for a short duration (Simulating polling for demo purposes)
-    // In a production app, you would poll /JSON/spider/view/status/?scanId=... until 100%
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // 2. Poll for spider completion
+    let progress = 0;
+    let attempts = 0;
+    const maxAttempts = 60; // 1 minute timeout
+
+    while (progress < 100 && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const statusUrl = `${ZAP_API_URL}/JSON/spider/view/status/?scanId=${scanId}&apikey=${ZAP_API_KEY}`;
+      try {
+        const statusRes = await fetch(statusUrl);
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          progress = parseInt(statusData.status);
+          console.log(`Spider progress: ${progress}%`);
+        }
+      } catch (e) {
+        console.warn("Error checking spider status", e);
+      }
+      attempts++;
+    }
 
     // 3. Get Alerts
+    // Use origin to ensure we catch alerts for the domain, not just the specific path/fragment
+    let baseUrl = url;
+    try {
+      baseUrl = new URL(url).origin;
+    } catch (e) {
+      console.warn("Could not parse URL for origin, using original URL", e);
+    }
+
     const alertsUrl = `${ZAP_API_URL}/JSON/core/view/alerts/?baseurl=${encodeURIComponent(
-      url
+      baseUrl
     )}&apikey=${ZAP_API_KEY}`;
     const alertsResponse = await fetch(alertsUrl);
 
