@@ -61,9 +61,7 @@ export default function HomePage() {
             Logout
           </Button>
         </div>
-        <h1 className="text-4xl font-bold mb-6 text-primary">
-          Website Vulnerability Checker
-        </h1>
+        <h1 className="text-4xl font-bold mb-6 text-primary">Hack Aware</h1>
         <p className="text-lg text-muted mb-8 text-center max-w-2xl">
           Enter the URL of a website to check for common vulnerabilities and
           ensure your site is secure.
