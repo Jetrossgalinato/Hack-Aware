@@ -1,29 +1,59 @@
+import OpenAI from "openai";
 import { ScanResult } from "./scanner";
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 export async function analyzeReport(scanResult: ScanResult): Promise<string> {
-  // In a real implementation, this would call an LLM API (e.g., OpenAI, Anthropic).
-  // For now, we return a mock analysis.
+  if (!process.env.OPENAI_API_KEY) {
+    return "Error: OPENAI_API_KEY is not configured. Please set it in your environment variables to use the AI analysis.";
+  }
 
   console.log(`Analyzing report for: ${scanResult.url}`);
 
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  const prompt = `
+    I have a security scan report for the URL ${scanResult.url}.
+    Here are the raw alerts from OWASP ZAP:
+    ${JSON.stringify(scanResult.alerts, null, 2)}
 
-  return `
-Security Analysis for ${scanResult.url}
-
-Based on the scan results, here is a summary of the critical threats found:
-
-1. Cross Site Scripting (Reflected) - High Risk
-   Impact: Attackers can execute malicious scripts in the victim's browser, potentially stealing session cookies or redirecting users to malicious sites.
-   Fix: Implement strict input validation and output encoding. In React, use data binding (curly braces) which automatically escapes content. Avoid using 'dangerouslySetInnerHTML'.
-
-2. SQL Injection - High Risk
-   Impact: Attackers can manipulate your database queries to access, modify, or delete unauthorized data.
-   Fix: NEVER concatenate user input directly into SQL queries. Use parameterized queries or an ORM (like Prisma or TypeORM) which handles this automatically.
-
-3. Missing Anti-clickjacking Header - Medium Risk
-   Impact: Your site could be embedded in an iframe on a malicious site, tricking users into clicking hidden buttons.
-   Fix: Add the 'X-Frame-Options: DENY' or 'SAMEORIGIN' header to your HTTP responses.
+    Please analyze this for False Positives, explain the impact of the 'High' severity alerts in simple terms, and provide code fixes for a React/Node.js stack.
+    Format the output as clean plain text (no markdown symbols like # or *).
   `;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "You are a senior penetration tester." },
+        { role: "user", content: prompt },
+      ],
+    });
+
+    return response.choices[0].message.content || "No analysis generated.";
+  } catch (error) {
+    console.error("OpenAI API Error:", error);
+    console.log("Falling back to local analysis generation...");
+    return generateFallbackAnalysis(scanResult);
+  }
+}
+
+function generateFallbackAnalysis(scanResult: ScanResult): string {
+  let analysis = `Security Analysis for ${scanResult.url}\n\n`;
+  analysis += `Note: AI Analysis failed (Quota/API Error). Showing local summary based on scan results.\n\n`;
+
+  if (scanResult.alerts.length === 0) {
+    analysis += "No vulnerabilities were found during the scan. Good job!";
+    return analysis;
+  }
+
+  analysis += `Found ${scanResult.alerts.length} potential issues:\n\n`;
+
+  scanResult.alerts.forEach((alert, index) => {
+    analysis += `${index + 1}. ${alert.alert} - ${alert.risk} Risk\n`;
+    analysis += `   Description: ${alert.description}\n`;
+    analysis += `   Solution: ${alert.solution}\n\n`;
+  });
+
+  return analysis;
 }
