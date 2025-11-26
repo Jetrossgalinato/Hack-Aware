@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { scanUrl } from "@/lib/scanner";
 import { analyzeReport } from "@/lib/llm";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
 
 export async function POST(request: Request) {
   try {
@@ -20,6 +20,15 @@ export async function POST(request: Request) {
 
     // 3. Save to Supabase (if userId is provided)
     if (userId) {
+      const authHeader = request.headers.get("Authorization");
+
+      // Create a client with the user's token to respect RLS
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { global: { headers: { Authorization: authHeader || "" } } }
+      );
+
       const { error: dbError } = await supabase.from("scans").insert({
         user_id: userId,
         url: url,

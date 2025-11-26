@@ -72,9 +72,17 @@ export default function HomePage() {
     setAnalysis("");
 
     try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
       const response = await fetch("/api/check-vulnerabilities", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ url, userId: user?.id }),
       });
 
