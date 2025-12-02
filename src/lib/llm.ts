@@ -1,12 +1,15 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { ScanResult } from "./scanner";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY || "",
+});
 
-// Available models to try in order of preference
+// Available Groq models to try in order of preference
 const MODELS = [
-  "gemini-exp-1206", // Latest experimental model (Dec 2024)
-  "gemini-2.0-flash-exp", // Fallback experimental model
+  "llama-3.3-70b-versatile", // Latest and most capable (12k TPM)
+  "llama-3.1-8b-instant", // Faster, smaller model
+  "gemma2-9b-it", // Alternative fallback
 ];
 
 // Helper function to wait/delay
@@ -14,21 +17,54 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Summarize alerts to reduce token count
+function summarizeAlerts(scanResult: ScanResult): string {
+  // Prioritize high and medium risk alerts, limit description length
+  const priorityAlerts = scanResult.alerts
+    .filter((alert) => alert.risk === "High" || alert.risk === "Medium")
+    .slice(0, 10); // Limit to top 10
+
+  const lowAlerts = scanResult.alerts
+    .filter((alert) => alert.risk === "Low" || alert.risk === "Informational")
+    .slice(0, 5); // Limit low priority to 5
+
+  const limitedAlerts = [...priorityAlerts, ...lowAlerts].map((alert) => ({
+    alert: alert.alert,
+    risk: alert.risk,
+    description: alert.description?.substring(0, 200) || "",
+    solution: alert.solution?.substring(0, 200) || "",
+  }));
+
+  return JSON.stringify(limitedAlerts, null, 2);
+}
+
 // Try to generate content with retry logic
 async function generateWithRetry(
-  model: ReturnType<typeof genAI.getGenerativeModel>,
+  modelName: string,
   prompt: string,
   maxRetries = 2,
   baseDelay = 2000
 ): Promise<string> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      return response.text() || "No analysis generated.";
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        model: modelName,
+        temperature: 0.7,
+        max_tokens: 4096,
+      });
+      return (
+        completion.choices[0]?.message?.content || "No analysis generated."
+      );
     } catch (error: unknown) {
       const isRateLimitError =
         (error as { status?: number })?.status === 429 ||
+        (error as { message?: string })?.message?.includes("rate") ||
         (error as { message?: string })?.message?.includes("quota") ||
         (error as { message?: string })?.message?.includes("429");
 
@@ -45,28 +81,34 @@ async function generateWithRetry(
 }
 
 export async function analyzeReport(scanResult: ScanResult): Promise<string> {
-  if (!process.env.GEMINI_API_KEY) {
-    return "Error: GEMINI_API_KEY is not configured. Please set it in your environment variables to use the AI analysis.";
+  if (!process.env.GROQ_API_KEY) {
+    return "Error: GROQ_API_KEY is not configured. Please set it in your environment variables to use the AI analysis.";
   }
 
   console.log(`Analyzing report for: ${scanResult.url}`);
 
-  const prompt = `
-    You are a senior penetration tester.
-    I have a security scan report for the URL ${scanResult.url}.
-    Here are the raw alerts from OWASP ZAP:
-    ${JSON.stringify(scanResult.alerts, null, 2)}
+  const alertsSummary = summarizeAlerts(scanResult);
+  const totalAlerts = scanResult.alerts.length;
 
-    Please analyze this for False Positives, explain the impact of the 'High' severity alerts in simple terms, and provide code fixes for a React/Node.js stack.
-    Format the output as clean plain text (no markdown symbols like # or *).
-  `;
+  const prompt = `You are a senior penetration tester.
+I have a security scan report for ${scanResult.url}.
+Total alerts found: ${totalAlerts}
+
+Top priority alerts from OWASP ZAP:
+${alertsSummary}
+
+Analyze this for:
+1. False Positives likelihood
+2. Impact of High severity alerts in simple terms
+3. Quick code fixes for React/Node.js stack
+
+Be concise. Format as plain text (no markdown symbols).`;
 
   // Try multiple models with retry logic
   for (const modelName of MODELS) {
     try {
       console.log(`Attempting to use model: ${modelName}`);
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const result = await generateWithRetry(model, prompt);
+      const result = await generateWithRetry(modelName, prompt);
       console.log(`Successfully generated analysis using ${modelName}`);
       return result;
     } catch (error: unknown) {
