@@ -204,17 +204,17 @@ export default function HomePage() {
                         );
                       }
                       return (
-                        <div className="relative my-4">
-                          <div className="absolute right-2 top-2 z-10">
+                        <span className="relative block my-4">
+                          <span className="absolute right-2 top-2 z-10">
                             <CopyButton
                               text={String(children).replace(/\n$/, "")}
                             />
-                          </div>
+                          </span>
                           <code
                             className="block bg-zinc-950 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto text-sm font-mono text-zinc-50 border border-border/50 shadow-sm"
                             {...props}
                           />
-                        </div>
+                        </span>
                       );
                     },
                     blockquote: ({ ...props }) => (
