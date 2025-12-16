@@ -72,7 +72,7 @@ export default function HomePage() {
         Enter the URL of a website to check for common vulnerabilities and
         ensure your site is secure.
       </p>
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-2xl space-y-8">
         <div className="flex flex-col gap-4">
           <div>
             <Label htmlFor="url" className="mb-2 block">
