@@ -138,24 +138,24 @@ export default function HomePage() {
 
         {analysis && (
           <Card className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 border-primary/20 shadow-lg overflow-hidden">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-2xl text-primary">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-3xl font-bold text-primary">
                 Security Analysis
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-2">
               <div className="prose dark:prose-invert max-w-none">
                 <ReactMarkdown
                   components={{
                     h1: ({ ...props }) => (
                       <h1
-                        className="text-3xl font-bold text-primary mt-6 mb-4 border-b border-primary/20 pb-2"
+                        className="text-3xl font-bold text-primary mt-6 first:mt-0 mb-4 border-b border-primary/20 pb-2"
                         {...props}
                       />
                     ),
                     h2: ({ ...props }) => (
                       <h2
-                        className="text-2xl font-semibold text-primary mt-8 mb-4 flex items-center gap-2"
+                        className="text-2xl font-semibold text-primary mt-8 first:mt-0 mb-4 flex items-center gap-2"
                         {...props}
                       />
                     ),
