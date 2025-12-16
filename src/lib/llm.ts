@@ -22,17 +22,17 @@ function summarizeAlerts(scanResult: ScanResult): string {
   // Prioritize high and medium risk alerts, limit description length
   const priorityAlerts = scanResult.alerts
     .filter((alert) => alert.risk === "High" || alert.risk === "Medium")
-    .slice(0, 10); // Limit to top 10
+    .slice(0, 15); // Increased limit to top 15
 
   const lowAlerts = scanResult.alerts
     .filter((alert) => alert.risk === "Low" || alert.risk === "Informational")
-    .slice(0, 5); // Limit low priority to 5
+    .slice(0, 10); // Increased limit to 10
 
   const limitedAlerts = [...priorityAlerts, ...lowAlerts].map((alert) => ({
     alert: alert.alert,
     risk: alert.risk,
-    description: alert.description?.substring(0, 200) || "",
-    solution: alert.solution?.substring(0, 200) || "",
+    description: alert.description?.substring(0, 500) || "", // Increased context
+    solution: alert.solution?.substring(0, 500) || "",
   }));
 
   return JSON.stringify(limitedAlerts, null, 2);
@@ -41,7 +41,8 @@ function summarizeAlerts(scanResult: ScanResult): string {
 // Try to generate content with retry logic
 async function generateWithRetry(
   modelName: string,
-  prompt: string,
+  systemPrompt: string,
+  userPrompt: string,
   maxRetries = 2,
   baseDelay = 2000
 ): Promise<string> {
@@ -50,8 +51,12 @@ async function generateWithRetry(
       const completion = await groq.chat.completions.create({
         messages: [
           {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
             role: "user",
-            content: prompt,
+            content: userPrompt,
           },
         ],
         model: modelName,
@@ -64,8 +69,12 @@ async function generateWithRetry(
     } catch (error: unknown) {
       const isRateLimitError =
         (error as { status?: number })?.status === 429 ||
-        (error as { message?: string })?.message?.includes("rate") ||
-        (error as { message?: string })?.message?.includes("quota") ||
+        (error as { message?: string })?.message
+          ?.toLowerCase()
+          .includes("rate") ||
+        (error as { message?: string })?.message
+          ?.toLowerCase()
+          .includes("quota") ||
         (error as { message?: string })?.message?.includes("429");
 
       if (isRateLimitError && attempt < maxRetries) {
@@ -90,25 +99,34 @@ export async function analyzeReport(scanResult: ScanResult): Promise<string> {
   const alertsSummary = summarizeAlerts(scanResult);
   const totalAlerts = scanResult.alerts.length;
 
-  const prompt = `You are a senior penetration tester.
-I have a security scan report for ${scanResult.url}.
+  const systemPrompt = `You are a senior penetration tester and security expert.
+Your goal is to explain security vulnerabilities to developers clearly and provide actionable fixes.
+Provide the output in a clear, structured Markdown format.
+Use headers (##, ###), bold text (**text**), and code blocks (\`\`\`) for readability.
+Use emojis to make the report engaging but professional.`;
+
+  const userPrompt = `I have a security scan report for ${scanResult.url}.
 Total alerts found: ${totalAlerts}
 
 Top priority alerts from OWASP ZAP:
 ${alertsSummary}
 
-Analyze this for:
-1. False Positives likelihood
-2. Impact of High severity alerts in simple terms
-3. Quick code fixes for React/Node.js stack
+Please provide a comprehensive analysis covering:
+1. False Positives likelihood (assess if any alerts might be false alarms)
+2. Impact Analysis (explain the risks of High/Medium alerts in simple terms)
+3. Remediation (provide specific code fixes or configuration changes for a React/Node.js stack)
 
-Be concise. Format as plain text (no markdown symbols).`;
+Keep the tone professional but accessible to developers.`;
 
   // Try multiple models with retry logic
   for (const modelName of MODELS) {
     try {
       console.log(`Attempting to use model: ${modelName}`);
-      const result = await generateWithRetry(modelName, prompt);
+      const result = await generateWithRetry(
+        modelName,
+        systemPrompt,
+        userPrompt
+      );
       console.log(`Successfully generated analysis using ${modelName}`);
       return result;
     } catch (error: unknown) {
@@ -128,8 +146,8 @@ Be concise. Format as plain text (no markdown symbols).`;
 
 function generateFallbackAnalysis(scanResult: ScanResult): string {
   let analysis = `Security Analysis for ${scanResult.url}\n\n`;
-  analysis += `⚠️  Note: AI-powered analysis is currently unavailable due to API quota limits.\n`;
-  analysis += `Please wait a few minutes for the quota to reset, or upgrade your Gemini API plan.\n`;
+  analysis += `⚠️  Note: AI-powered analysis is currently unavailable due to API quota limits or connectivity issues.\n`;
+  analysis += `Please wait a few minutes for the quota to reset, or check your Groq API configuration.\n`;
   analysis += `Showing local summary based on ZAP scan results:\n\n`;
 
   if (scanResult.alerts.length === 0) {
