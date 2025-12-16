@@ -114,10 +114,10 @@ export default function HomePage() {
         </div>
 
         {analysis && (
-          <Card className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 border-primary/20 shadow-lg">
-            <CardHeader className="bg-muted/30 border-b border-border/50">
-              <CardTitle className="text-2xl text-primary flex items-center gap-2">
-                🛡️ Security Analysis
+          <Card className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 border-primary/20 shadow-lg overflow-hidden">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-2xl text-primary">
+                Security Analysis
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -174,12 +174,12 @@ export default function HomePage() {
                       const { inline } = props;
                       return inline ? (
                         <code
-                          className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary"
+                          className="bg-primary/10 px-1.5 py-0.5 rounded text-sm font-mono text-primary font-semibold"
                           {...props}
                         />
                       ) : (
                         <code
-                          className="block bg-muted p-4 rounded-lg overflow-x-auto my-4 text-sm font-mono text-foreground border border-border"
+                          className="block bg-zinc-950 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto my-4 text-sm font-mono text-zinc-50 border border-border/50 shadow-sm"
                           {...props}
                         />
                       );
