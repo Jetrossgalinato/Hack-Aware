@@ -4,7 +4,6 @@ import "../styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { SlidingAlertProvider } from "@/components/ui/SlidingAlert";
-import AuthGuard from "@/lib/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Hack Aware",
@@ -26,9 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SlidingAlertProvider>
-            <AuthGuard>{children}</AuthGuard>
-          </SlidingAlertProvider>
+          <SlidingAlertProvider>{children}</SlidingAlertProvider>
         </ThemeProvider>
       </body>
     </html>
