@@ -9,6 +9,29 @@ import { useSlidingAlert } from "@/components/ui/SlidingAlert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReactMarkdown from "react-markdown";
+import { Check, Copy } from "lucide-react";
+
+function CopyButton({ text }: { text: string }) {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(text);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-6 w-6 text-zinc-400 hover:text-zinc-50"
+      onClick={copy}
+    >
+      {isCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      <span className="sr-only">Copy code</span>
+    </Button>
+  );
+}
 
 export default function HomePage() {
   const [url, setUrl] = useState("");
@@ -171,17 +194,27 @@ export default function HomePage() {
                     ),
                     code: ({ ...props }) => {
                       // @ts-expect-error - inline is not in the types but is passed by react-markdown
-                      const { inline } = props;
-                      return inline ? (
-                        <code
-                          className="bg-primary/10 px-1.5 py-0.5 rounded text-sm font-mono text-primary font-semibold"
-                          {...props}
-                        />
-                      ) : (
-                        <code
-                          className="block bg-zinc-950 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto my-4 text-sm font-mono text-zinc-50 border border-border/50 shadow-sm"
-                          {...props}
-                        />
+                      const { inline, children } = props;
+                      if (inline) {
+                        return (
+                          <code
+                            className="bg-primary/10 px-1.5 py-0.5 rounded text-sm font-mono text-primary font-semibold"
+                            {...props}
+                          />
+                        );
+                      }
+                      return (
+                        <div className="relative my-4">
+                          <div className="absolute right-2 top-2 z-10">
+                            <CopyButton
+                              text={String(children).replace(/\n$/, "")}
+                            />
+                          </div>
+                          <code
+                            className="block bg-zinc-950 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto text-sm font-mono text-zinc-50 border border-border/50 shadow-sm"
+                            {...props}
+                          />
+                        </div>
                       );
                     },
                     blockquote: ({ ...props }) => (
