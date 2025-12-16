@@ -8,6 +8,7 @@ import { ModeToggle } from "@/components/mode-toggler";
 import { useSlidingAlert } from "@/components/ui/SlidingAlert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import ReactMarkdown from "react-markdown";
 
 export default function HomePage() {
   const [url, setUrl] = useState("");
@@ -113,13 +114,86 @@ export default function HomePage() {
         </div>
 
         {analysis && (
-          <Card className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <CardHeader>
-              <CardTitle>Security Analysis</CardTitle>
+          <Card className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 border-primary/20 shadow-lg">
+            <CardHeader className="bg-muted/30 border-b border-border/50">
+              <CardTitle className="text-2xl text-primary flex items-center gap-2">
+                🛡️ Security Analysis
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap font-mono text-sm">
-                {analysis}
+            <CardContent className="pt-6">
+              <div className="prose dark:prose-invert max-w-none">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ ...props }) => (
+                      <h1
+                        className="text-3xl font-bold text-primary mt-6 mb-4 border-b border-primary/20 pb-2"
+                        {...props}
+                      />
+                    ),
+                    h2: ({ ...props }) => (
+                      <h2
+                        className="text-2xl font-semibold text-primary mt-8 mb-4 flex items-center gap-2"
+                        {...props}
+                      />
+                    ),
+                    h3: ({ ...props }) => (
+                      <h3
+                        className="text-xl font-medium text-secondary mt-6 mb-3"
+                        {...props}
+                      />
+                    ),
+                    p: ({ ...props }) => (
+                      <p
+                        className="leading-7 text-muted-foreground mb-4"
+                        {...props}
+                      />
+                    ),
+                    ul: ({ ...props }) => (
+                      <ul
+                        className="list-disc list-inside space-y-2 my-4 ml-4"
+                        {...props}
+                      />
+                    ),
+                    ol: ({ ...props }) => (
+                      <ol
+                        className="list-decimal list-inside space-y-2 my-4 ml-4"
+                        {...props}
+                      />
+                    ),
+                    li: ({ ...props }) => (
+                      <li className="text-muted-foreground" {...props} />
+                    ),
+                    strong: ({ ...props }) => (
+                      <strong
+                        className="font-bold text-foreground bg-primary/10 px-1 rounded"
+                        {...props}
+                      />
+                    ),
+                    code: ({ ...props }) => {
+                      // @ts-expect-error - inline is not in the types but is passed by react-markdown
+                      const { inline } = props;
+                      return inline ? (
+                        <code
+                          className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary"
+                          {...props}
+                        />
+                      ) : (
+                        <code
+                          className="block bg-muted p-4 rounded-lg overflow-x-auto my-4 text-sm font-mono text-foreground border border-border"
+                          {...props}
+                        />
+                      );
+                    },
+                    blockquote: ({ ...props }) => (
+                      <blockquote
+                        className="border-l-4 border-primary/50 pl-4 italic text-muted-foreground my-4 bg-muted/30 py-2 pr-2 rounded-r"
+                        {...props}
+                      />
+                    ),
+                  }}
+                >
+                  {analysis}
+                </ReactMarkdown>
               </div>
             </CardContent>
           </Card>
